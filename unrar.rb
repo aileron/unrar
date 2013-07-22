@@ -38,6 +38,7 @@ class Unrar
   # Opens a RAR file and parses the header data
   def initialize(filename)
     @fh = open(File.expand_path(filename),"r")
+    @fh.seek(7,IO::SEEK_CUR) # signature skip
     @eof = false
     # check marker header
     parse_header
@@ -45,7 +46,6 @@ class Unrar
   
   # Lists the files in this archive
   def list_contents
-    @fh.seek(7)
     parse_header # The archive header
     @files = []
     begin
@@ -85,7 +85,6 @@ class Unrar
   
   private
   def parse_header(full = false)
-    @fh.seek(7,IO::SEEK_CUR) # signature skip
     @fh.seek(2,IO::SEEK_CUR) # I don't use the CRC
     details = {}
     
