@@ -46,7 +46,7 @@ class Unrar
   
   # Lists the files in this archive
   def list_contents
-    parse_header # The archive header
+    #parse_header # The archive header
     @files = []
     begin
       while
@@ -81,9 +81,9 @@ class Unrar
   
   private
   def parse_header(full = false)
-    @fh.seek(2,IO::SEEK_CUR) # I don't use the CRC
     details = {}
     
+    @fh.seek(2,IO::SEEK_CUR) # I don't use the CRC
     ord = @fh.readpartial(1).ord
     case ord
     when 0x72
@@ -126,7 +126,7 @@ class Unrar
       # DOS date/time
       @fh.readpartial(4).unpack("v").collect{|t| ((t & 0xF800) >> 11) + ((t & 0x07E0) >> 5)*60 + ((t & 0x001F) * 3600)}[0] # - just the time section atm
       @fh.seek(1,IO::SEEK_CUR) # RAR version, ought to check this
-      details[:compression_level] = @fh.readpartial(1)[0] - 0x30
+      details[:compression_level] = @fh.readpartial(1).to_i - 0x30
       fnamelength = @fh.readpartial(2).unpack("v")[0]
       details[:attributes] = @fh.readpartial(4).unpack("V")[0]
       if (@flags & FILE_HIGH_PACK != 0)
