@@ -85,10 +85,11 @@ class Unrar
   
   private
   def parse_header(full = false)
+    @fh.seek(7,IO::SEEK_CUR) # signature skip
     @fh.seek(2,IO::SEEK_CUR) # I don't use the CRC
     details = {}
     
-    case @fh.readpartial(1)[0]
+    case @fh.readpartial(1).ord
     when 0x72
       raise StandardError, "Not a valid RAR file" if @fh.readpartial(4).unpack("vv") != [6689,7]
       return true
