@@ -62,7 +62,6 @@ class Unrar
   
   # Gets the file id of the filename given in the archive
   def getid(fname)
-    list_contents if @files.nil?
     fid = @files.each_index do |n|
       break n if @files[n][:filename] == fname
     end
@@ -100,7 +99,7 @@ class Unrar
       raise EOFError
       return
     else
-      raise NotImplementedError, "[#{ord}] The HEAD_TYPE encountered is not one this library supports"
+      raise NotImplementedError, "[#{@fh.pos}:#{ord}] The HEAD_TYPE encountered is not one this library supports"
     end
       
     details[:blockstart] = @fh.pos - 3
