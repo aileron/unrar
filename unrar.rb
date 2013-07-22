@@ -63,11 +63,8 @@ class Unrar
   # Gets the file id of the filename given in the archive
   def getid(fname)
     list_contents if @files.nil?
-    @files.each_index do |n|
-      if @files[n][:filename] == fname
-        fid = n
-        break
-      end
+    fid = @files.each_index do |n|
+      break n if @files[n][:filename] == fname
     end
     raise StandardError, "That file does not exist" if (fid >= @files.length) or fid.nil?
     fid
@@ -88,7 +85,8 @@ class Unrar
     @fh.seek(2,IO::SEEK_CUR) # I don't use the CRC
     details = {}
     
-    case @fh.readpartial(1).ord
+    ord = @fh.readpartial(1).ord
+    case ord
     when 0x72
       raise StandardError, "Not a valid RAR file" if @fh.readpartial(4).unpack("vv") != [6689,7]
       return true
@@ -102,7 +100,7 @@ class Unrar
       raise EOFError
       return
     else
-      raise NotImplementedError, "The HEAD_TYPE encountered is not one this library supports"
+      raise NotImplementedError, "[#{ord}] The HEAD_TYPE encountered is not one this library supports"
     end
       
     details[:blockstart] = @fh.pos - 3
